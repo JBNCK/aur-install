@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+if [ -z "$1" ]; then
+	echo "Please provide a package."
+	exit 1
+fi
+
+dir=$(pwd)
+cd /tmp || { echo "Failed to cd into /tmp."; exit 1; }
+
+git clone http://aur.archlinux.org/"$1".git || { echo "Clone failed."; cd "$dir"; rm -rf "/tmp/$1"; exit 1; }
+cd "$1" || { echo "Failed to enter cloned directory."; cd "$dir"; rm -rf "/tmp/$1"; exit 1; }
+makepkg -si || { echo "Failed to build package."; cd "$dir"; rm -rf "/tmp/$1"; exit 1; }
+
+cd "$dir" || { echo "Failed to cd back to original directory."; cd "$dir"; rm -rf "/tmp/$1"; exit; }
+rm -rf "/tmp/$1"
+echo "Process completed successfully."
